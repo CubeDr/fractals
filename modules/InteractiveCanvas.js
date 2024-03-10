@@ -18,7 +18,7 @@ export class InteractiveCanvas {
     this.height = height;
     this.listener = listener;
     this.leftTopR = realMin;
-    this.leftTopI = imagMin;
+    this.leftTopI = imagMax;
     this.map = new Array(height)
       .fill(null)
       .map(() => new Array(width).fill(null));
@@ -47,7 +47,7 @@ export class InteractiveCanvas {
   populate() {
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
-        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(i), this.leftTopI - this.convertPixelToImaginary(j))
+        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(i), this.leftTopI - this.convertPixelToImaginary(j));
       }
     }
 
