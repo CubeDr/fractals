@@ -2,8 +2,6 @@ const realMin = -2.4; // LEFT x min
 const realMax = 1.2; // RIGHT x max
 const imagMin = -1.2; // bottom y min
 const imagMax = 1.2; // top y max
-const realTotal = realMax - realMin;
-const imagTotal = imagMax - imagMin;
 
 export class InteractiveCanvas {
   /**
@@ -19,12 +17,15 @@ export class InteractiveCanvas {
     this.listener = listener;
     this.leftTopR = realMin;
     this.leftTopI = imagMax;
+    this.realTotal = realMax - realMin;
+    this.imagTotal = imagMax - imagMin;
     this.map = new Array(height)
       .fill(null)
       .map(() => new Array(width).fill(null));
 
     this.resultListeners_ = new Set();
     this.populate();
+    console.log(this.leftTopR, this.leftTopI, this.realTotal, this.imagTotal);
   }
 
   listen(resultListener) {
@@ -105,11 +106,11 @@ export class InteractiveCanvas {
   }
 
   convertPixelToReal(px) {
-    return px * realTotal / this.width;
+    return px * this.realTotal / this.width;
   }
 
   convertPixelToImaginary(py) {
-    return py * imagTotal / this.height;
+    return py * this.imagTotal / this.height;
   }
 
   populate() {
@@ -122,7 +123,7 @@ export class InteractiveCanvas {
     this.notifyListeners_();
   }
 
-  zoomIn(px, py) {
+  async previewZoom_(px, py) {
     const newMap = new Array(this.height)
       .fill(null)
       .map(() => new Array(this.width).fill(null));
@@ -139,6 +140,20 @@ export class InteractiveCanvas {
     }
     this.map = newMap;
     this.notifyListeners_();
+  }
+
+  async realZoom_(px, py) {
+    const r = this.leftTopR + this.convertPixelToReal(px);
+    const i = this.leftTopI - this.convertPixelToImaginary(py);
+    this.leftTopR = (this.leftTopR + r) / 2;
+    this.leftTopI = (this.leftTopI + i) / 2;
+    this.realTotal /= 2;
+    this.imagTotal /= 2;
+    this.populate();
+  }
+
+  zoomIn(px, py) {
+    this.previewZoom_(px, py).then(() => this.realZoom_(px, py));
   }
 
   notifyListeners_() {

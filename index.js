@@ -11,14 +11,27 @@ const ctx = canvas.getContext('2d');
 mouseDragInteraction.register(canvas, interactiveCanvas);
 mouseZoomInteraction.register(canvas, interactiveCanvas);
 
+const imageData = ctx.createImageData(600, 400);
 function paint(result) {
   for (let y = 0; y < result.length; y++) {
     for (let x = 0; x < result[y].length; x++) {
       const iterations = result[y][x];
-      ctx.fillStyle = iterations === -1 ? 'black' : `hsl(${(iterations / 100) * 360}, 100%, 50%)`;
-      ctx.fillRect(x, y, 1, 1);
+
+      const index = (y * result[y].length + x) * 4;
+      if (iterations === -1) {
+        imageData.data[index] = 0;
+        imageData.data[index + 1] = 0;
+        imageData.data[index + 2] = 0;
+        imageData.data[index + 3] = 255;
+      } else {
+        imageData.data[index] = 255;
+        imageData.data[index + 1] = iterations / 100 * 255;
+        imageData.data[index + 2] = 80;
+        imageData.data[index + 3] = 255;
+      }
     }
   }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 interactiveCanvas.listen(paint);
