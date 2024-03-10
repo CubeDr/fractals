@@ -43,8 +43,6 @@ export class InteractiveCanvas {
     this.leftTopR -= this.convertPixelToReal(dpx);
     this.leftTopI += this.convertPixelToImaginary(dpy);
     
-    console.log(dpx, dpy);
-    
     // return this.populate();
 
     // 좌상단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 우하단으로 이동)
