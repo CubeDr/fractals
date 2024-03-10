@@ -1,4 +1,5 @@
 import AbstractInteraction from './AbstractInteraction.js';
+import { InteractiveCanvas } from '../InteractiveCanvas.js';
 
 class MouseZoomInteraction extends AbstractInteraction {
   constructor() {
@@ -15,8 +16,9 @@ class MouseZoomInteraction extends AbstractInteraction {
 
   /**
    * @param {HTMLCanvasElement} canvas 
+   * @Param {InteractiveCanvas} interactiveCanvas
    */
-  register(canvas) {
+  register(canvas, interactiveCanvas) {
     canvas.addEventListener('wheel', (event) => {
       if (event.deltaY > 0) {
         this.zoomOut_(event);

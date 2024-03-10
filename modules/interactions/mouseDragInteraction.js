@@ -1,4 +1,5 @@
 import AbstractInteraction from './AbstractInteraction.js';
+import { InteractiveCanvas } from '../InteractiveCanvas.js';
 
 class MouseDragInteraction extends AbstractInteraction {
   constructor() {
@@ -34,8 +35,9 @@ class MouseDragInteraction extends AbstractInteraction {
 
   /**
    * @param {HTMLCanvasElement} canvas 
+   * @Param {InteractiveCanvas} interactiveCanvas
    */
-  register(canvas) {
+  register(canvas, interactiveCanvas) {
     canvas.addEventListener('mousedown', this.onMouseDown_.bind(this));
     canvas.addEventListener('mouseup', this.onMouseUp_.bind(this));
     canvas.addEventListener('mousemove', this.onMouseMove_.bind(this));

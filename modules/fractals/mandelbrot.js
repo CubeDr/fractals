@@ -1,6 +1,7 @@
 const MAX_ITERACTIONS = 100;
 
 export default function mandelbrot(r, i) {
+  console.log(r, i);
   let zr = 0;
   let zi = 0;
   let iterations = 0;
