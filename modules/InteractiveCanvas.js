@@ -25,7 +25,6 @@ export class InteractiveCanvas {
 
     this.resultListeners_ = new Set();
     this.populate();
-    console.log(this.leftTopR, this.leftTopI, this.realTotal, this.imagTotal);
   }
 
   listen(resultListener) {
