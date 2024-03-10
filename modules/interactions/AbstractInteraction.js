@@ -1,4 +1,4 @@
-import { InteractiveCanvas } from '../InteractiveCanvas.js';
+import { InteractiveCanvas } from '../interactiveCanvas/InteractiveCanvas.js';
 
 export default class AbstractInteraction {
   /**

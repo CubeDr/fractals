@@ -1,5 +1,5 @@
 import AbstractInteraction from './AbstractInteraction.js';
-import { InteractiveCanvas } from '../InteractiveCanvas.js';
+import { InteractiveCanvas } from '../interactiveCanvas/InteractiveCanvas.js';
 
 class MouseDragInteraction extends AbstractInteraction {
   constructor() {
