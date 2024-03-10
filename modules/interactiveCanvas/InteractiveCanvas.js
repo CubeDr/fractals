@@ -103,7 +103,7 @@ export class InteractiveCanvas {
   zoomIn(px, py) {
     this.previewZoomIn_(px, py).then(() => this.realZoomIn_(px, py));
   }
-  
+
   zoomOut(px, py) {
     const { x: r, y: i } = this.canvasBounds.convert(px, py, this.fractalBounds);
     this.fractalBounds.zoomOut(r, i);

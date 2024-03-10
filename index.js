@@ -4,14 +4,14 @@ import mouseZoomInteraction from './modules/interactions/mouseZoomInteraction.js
 import { InteractiveCanvas } from './modules/interactiveCanvas/InteractiveCanvas.js';
 import { attachMaxIterationsListener, listenToMaxIterations } from './modules/maxIterations.js';
 
-const interactiveCanvas = new InteractiveCanvas(600, 400, mandelbrot);
 const canvas = document.getElementById('fractalCanvas');
 const ctx = canvas.getContext('2d');
+const interactiveCanvas = new InteractiveCanvas(canvas.width, canvas.height, mandelbrot);
 
 mouseDragInteraction.register(canvas, interactiveCanvas);
 mouseZoomInteraction.register(canvas, interactiveCanvas);
 
-const imageData = ctx.createImageData(600, 400);
+const imageData = ctx.createImageData(canvas.width, canvas.height);
 function paint(result) {
   for (let y = 0; y < result.length; y++) {
     for (let x = 0; x < result[y].length; x++) {
