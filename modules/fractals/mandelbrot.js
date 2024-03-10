@@ -1,11 +1,17 @@
-const MAX_ITERACTIONS = 100;
+import { listenToMaxIterations } from '../maxIterations.js';
+
+let maxIterations = 100;
+
+listenToMaxIterations(newMaxIterations => {
+  maxIterations = newMaxIterations;
+});
 
 export default function mandelbrot(r, i) {
   let zr = 0;
   let zi = 0;
   let iterations = 0;
 
-  while (iterations < MAX_ITERACTIONS) {
+  while (iterations < maxIterations) {
     const zrtemp = zr * zr - zi * zi + r;
     zi = 2 * zr * zi + i;
     zr = zrtemp;

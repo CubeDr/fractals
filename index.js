@@ -2,6 +2,7 @@ import mandelbrot from './modules/fractals/mandelbrot.js';
 import mouseDragInteraction from './modules/interactions/mouseDragInteraction.js';
 import mouseZoomInteraction from './modules/interactions/mouseZoomInteraction.js';
 import { InteractiveCanvas } from './modules/InteractiveCanvas.js';
+import { attachMaxIterationsListener } from './modules/maxIterations.js';
 
 const interactiveCanvas = new InteractiveCanvas(600, 400, mandelbrot);
 const canvas = document.getElementById('fractalCanvas');
@@ -18,3 +19,5 @@ for (let y = 0; y < result.length; y++) {
     ctx.fillRect(x, y, 1, 1);
   }
 }
+
+attachMaxIterationsListener();
