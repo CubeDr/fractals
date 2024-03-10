@@ -40,7 +40,68 @@ export class InteractiveCanvas {
   move(dpx, dpy) {
     this.leftTopR -= this.convertPixelToReal(dpx);
     this.leftTopI += this.convertPixelToImaginary(dpy);
-    this.populate();
+    
+    console.log(dpx, dpy);
+    
+    // return this.populate();
+
+    // 좌상단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 우하단으로 이동)
+    if (dpx <= 0 && dpy <= 0) {
+      for (let i = 0; i < this.height; i++) {
+        for (let j = 0; j < this.width; j++) {
+          if (i < this.height + dpy && j < this.width + dpx) {
+            this.map[i][j] = this.map[i - dpy][j - dpx];
+          }
+          else {
+            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
+          }
+        }
+      }
+    }
+
+    // 좌하단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 우상단으로 이동)
+    else if (dpx <= 0 && dpy > 0) {
+      for (let i = this.height - 1; i >= 0; i--) {
+        for (let j = 0; j < this.width; j++) {
+          if (i >= dpy && j < this.width + dpx) {
+            this.map[i][j] = this.map[i - dpy][j - dpx];
+          }
+          else {
+            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
+          }
+        }
+      }
+    }
+
+    // 우상단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 좌하단으로 이동)
+    else if (dpx > 0 && dpy <= 0) {
+      for (let i = 0; i < this.height; i++) {
+        for (let j = this.width - 1; j >= 0; j--) {
+          if (i < this.height + dpy && j >= dpx) {
+            this.map[i][j] = this.map[i - dpy][j - dpx];
+          }
+          else {
+            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
+          }
+        }
+      }
+    }
+
+    // 우하단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 좌상단으로 이동)
+    else {
+      for (let i = this.height - 1; i >= 0; i--) {
+        for (let j = this.width - 1; j >= 0; j--) {
+          if (i >= dpy && j >= dpx) {
+            this.map[i][j] = this.map[i - dpy][j - dpx];
+          }
+          else {
+            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
+          }
+        }
+      }
+    }
+
+    this.notifyListeners_();
   }
 
   convertPixelToReal(px) {
