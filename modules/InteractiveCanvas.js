@@ -3,6 +3,8 @@ const realMax = 1.2; // RIGHT x max
 const imagMin = -1.2; // bottom y min
 const imagMax = 1.2; // top y max
 
+const PRECISE_THRESHOLD = 0.00000000000001;
+
 export class InteractiveCanvas {
   /**
    * 
@@ -115,7 +117,9 @@ export class InteractiveCanvas {
   populate() {
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
-        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
+        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j),
+          this.leftTopI - this.convertPixelToImaginary(i),
+          this.realTotal < PRECISE_THRESHOLD);
       }
     }
 

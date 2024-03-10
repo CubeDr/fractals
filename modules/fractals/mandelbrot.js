@@ -6,7 +6,11 @@ listenToMaxIterations(newMaxIterations => {
   maxIterations = newMaxIterations;
 });
 
-export default function mandelbrot(r, i) {
+function preciseMandelbrot(r, i) {
+
+}
+
+function naturalMandelbrot(r, i) {
   let zr = 0;
   let zi = 0;
   let iterations = 0;
@@ -23,4 +27,8 @@ export default function mandelbrot(r, i) {
   }
 
   return -1; // Inside the Mandelbrot set 
+}
+
+export default function mandelbrot(r, i, usePrecise) {
+  return naturalMandelbrot(r, i);
 };
