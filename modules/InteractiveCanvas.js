@@ -22,7 +22,14 @@ export class InteractiveCanvas {
     this.map = new Array(height)
       .fill(null)
       .map(() => new Array(width).fill(null));
+
+    this.resultListeners_ = new Set();
     this.populate();
+  }
+
+  listen(resultListener) {
+    this.resultListeners_.add(resultListener);
+    resultListener(this.map);
   }
 
   /**
@@ -33,7 +40,7 @@ export class InteractiveCanvas {
   move(dpx, dpy) {
     this.leftTopR -= this.convertPixelToReal(dpx);
     this.leftTopI += this.convertPixelToImaginary(dpy);
-    return this.populate();
+    this.populate();
   }
 
   convertPixelToReal(px) {
@@ -51,6 +58,12 @@ export class InteractiveCanvas {
       }
     }
 
-    return this.map;
+    this.notifyListeners_();
+  }
+
+  notifyListeners_() {
+    for (const resultListener of this.resultListeners_) {
+      resultListener(this.map);
+    }
   }
 }

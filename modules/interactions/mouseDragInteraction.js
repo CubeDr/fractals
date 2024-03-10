@@ -12,18 +12,6 @@ class MouseDragInteraction extends AbstractInteraction {
 
   onDrag_(dx, dy) {
     this.interactiveCanvas_?.move(dx, dy);
-
-    const canvas = document.getElementById('fractalCanvas');
-    const ctx = canvas.getContext('2d');
-
-    const result = this.interactiveCanvas_.populate();
-    for (let y = 0; y < result.length; y++) {
-      for (let x = 0; x < result[y].length; x++) {
-        const iterations = result[y][x];
-        ctx.fillStyle = iterations === -1 ? 'black' : `hsl(${(iterations / 100) * 360}, 100%, 50%)`;
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
   }
 
   onMouseDown_({ clientX, clientY }) {
