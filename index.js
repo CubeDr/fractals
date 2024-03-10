@@ -1,11 +1,8 @@
+import mouseDragInteraction from './modules/interactions/mouseDragInteraction.js';
+
 const canvas = document.getElementById('myCanvas');
-const ctx = canvas.getContext('2d');
 
-const width = canvas.width;
-const height = canvas.height;
-
-let isDragging = false;
-let startX, startY;
+mouseDragInteraction.register(canvas);
 
 function mandelbrot(x, y) {
     let zr = 0;
@@ -25,29 +22,3 @@ function mandelbrot(x, y) {
 
     return -1; // Inside the Mandelbrot set 
 }
-
-function onDrag(dx, dy) {
-    console.log(dx, dy);
-}
-
-canvas.addEventListener('mousedown', (event) => {
-    isDragging = true;
-    startX = event.clientX;
-    startY = event.clientY;
-});
-
-canvas.addEventListener('mouseup', () => {
-    isDragging = false;
-});
-
-canvas.addEventListener('mousemove', (event) => {
-    if (!isDragging) return;
-
-    const endX = event.clientX;
-    const endY = event.clientY;
-
-    onDrag(endX - startX, endY - startY);
-
-    startX = endX;
-    startY = endY;
-});
