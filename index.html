@@ -1,2 +1,21 @@
-<canvas id="myCanvas" width="800" height="600"></canvas>
+<style>
+  #fractalCanvas {
+    border: 2px solid black;
+    display: block;
+  }
+
+  .max-iterations {
+    margin-top: 14px;
+  }
+
+  .max-iterations * {
+    vertical-align: middle;
+  }
+</style>
+<canvas id="fractalCanvas" width="600" height="400"></canvas>
+<div class="max-iterations">
+  <label for="max-iterations">Max Iterations</label>
+  <input id="max-iterations-slider" type="range" min="1" max="1000" value="100">
+  <input id="max-iterations" type="number" value="100">
+</div>
 <script type="module" src="./index.js"></script>
