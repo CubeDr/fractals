@@ -1,3 +1,5 @@
+import Bounds from './bounds.js';
+
 const realMin = -2.4; // LEFT x min
 const realMax = 1.2; // RIGHT x max
 const imagMin = -1.2; // bottom y min
@@ -13,14 +15,10 @@ export class InteractiveCanvas {
    * @param {(r: number, i: number) => number} listener 
    */
   constructor(width, height, listener) {
-    // 좌표를 받아서 좌표에 해당하는 정수값을 계산하는 리스너
-    this.width = width;
-    this.height = height;
     this.listener = listener;
-    this.leftTopR = realMin;
-    this.leftTopI = imagMax;
-    this.realTotal = realMax - realMin;
-    this.imagTotal = imagMax - imagMin;
+    this.canvasBounds = new Bounds(0, 0, width, height);
+    this.fractalBounds = new Bounds(realMin, imagMin, realMax - realMin, imagMax - imagMin);
+
     this.map = new Array(height)
       .fill(null)
       .map(() => new Array(width).fill(null));
@@ -40,84 +38,37 @@ export class InteractiveCanvas {
    * @param {number} dpy 
    */
   move(dpx, dpy) {
-    this.leftTopR -= this.convertPixelToReal(dpx);
-    this.leftTopI += this.convertPixelToImaginary(dpy);
-    
-    // return this.populate();
+    const {x: dr, y: di} = this.canvasBounds.convertUnit(-dpx, -dpy, this.fractalBounds);
+    this.fractalBounds.move(dr, di);
 
-    // 좌상단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 우하단으로 이동)
-    if (dpx <= 0 && dpy <= 0) {
-      for (let i = 0; i < this.height; i++) {
-        for (let j = 0; j < this.width; j++) {
-          if (i < this.height + dpy && j < this.width + dpx) {
-            this.map[i][j] = this.map[i - dpy][j - dpx];
-          }
-          else {
-            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
-          }
+    const newMap = new Array(this.canvasBounds.height)
+      .fill(null)
+      .map(() => new Array(this.canvasBounds.width).fill(null));
+
+    for (let y = 0; y < this.canvasBounds.height; y++) {
+      for (let x = 0; x < this.canvasBounds.width; x++) {
+        const px = x - dpx;
+        const py = y - dpy;
+
+        if (this.map[py] != null && this.map[py][px] != null) {
+          newMap[y][x] = this.map[py][px];
+        } else {
+          const {x: r, y: i} = this.canvasBounds.convert(x, y, this.fractalBounds);
+          newMap[y][x] = this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD);
         }
       }
     }
 
-    // 좌하단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 우상단으로 이동)
-    else if (dpx <= 0 && dpy > 0) {
-      for (let i = this.height - 1; i >= 0; i--) {
-        for (let j = 0; j < this.width; j++) {
-          if (i >= dpy && j < this.width + dpx) {
-            this.map[i][j] = this.map[i - dpy][j - dpx];
-          }
-          else {
-            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
-          }
-        }
-      }
-    }
-
-    // 우상단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 좌하단으로 이동)
-    else if (dpx > 0 && dpy <= 0) {
-      for (let i = 0; i < this.height; i++) {
-        for (let j = this.width - 1; j >= 0; j--) {
-          if (i < this.height + dpy && j >= dpx) {
-            this.map[i][j] = this.map[i - dpy][j - dpx];
-          }
-          else {
-            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
-          }
-        }
-      }
-    }
-
-    // 우하단으로 드래그 했을 때 (즉, 보여지는 영역은 전체 그림의 좌상단으로 이동)
-    else {
-      for (let i = this.height - 1; i >= 0; i--) {
-        for (let j = this.width - 1; j >= 0; j--) {
-          if (i >= dpy && j >= dpx) {
-            this.map[i][j] = this.map[i - dpy][j - dpx];
-          }
-          else {
-            this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
-          }
-        }
-      }
-    }
+    this.map = newMap;
 
     this.notifyListeners_();
   }
 
-  convertPixelToReal(px) {
-    return px * this.realTotal / this.width;
-  }
-
-  convertPixelToImaginary(py) {
-    return py * this.imagTotal / this.height;
-  }
-
   populate() {
-    for (let i = 0; i < this.map.length; i++) {
-      for (let j = 0; j < this.map[i].length; j++) {
-        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j),
-          this.leftTopI - this.convertPixelToImaginary(i),
-          this.realTotal < PRECISE_THRESHOLD);
+    for (let y = 0; y < this.map.length; y++) {
+      for (let x = 0; x < this.map[y].length; x++) {
+        const { x: r, y: i } = this.canvasBounds.convert(x, y, this.fractalBounds);
+        this.map[y][x] = this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD);
       }
     }
 
@@ -125,12 +76,12 @@ export class InteractiveCanvas {
   }
 
   async previewZoom_(px, py) {
-    const newMap = new Array(this.height)
+    const newMap = new Array(this.canvasBounds.height)
       .fill(null)
-      .map(() => new Array(this.width).fill(null));
+      .map(() => new Array(this.canvasBounds.width).fill(null));
 
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
+    for (let y = 0; y < this.canvasBounds.height; y++) {
+      for (let x = 0; x < this.canvasBounds.width; x++) {
         const dx = x - px;
         const dy = y - py;
 
@@ -144,12 +95,8 @@ export class InteractiveCanvas {
   }
 
   async realZoom_(px, py) {
-    const r = this.leftTopR + this.convertPixelToReal(px);
-    const i = this.leftTopI - this.convertPixelToImaginary(py);
-    this.leftTopR = (this.leftTopR + r) / 2;
-    this.leftTopI = (this.leftTopI + i) / 2;
-    this.realTotal /= 2;
-    this.imagTotal /= 2;
+    const { x: r, y: i } = this.canvasBounds.convert(px, py, this.fractalBounds);
+    this.fractalBounds.zoom(r, i);
     this.populate();
   }
 
