@@ -1,4 +1,5 @@
 import Bounds from './bounds.js';
+import BufferedCanvas from './BufferedCanvas.js';
 
 const realMin = -2.4; // LEFT x min
 const realMax = 1.2; // RIGHT x max
@@ -19,9 +20,7 @@ export class InteractiveCanvas {
     this.canvasBounds = new Bounds(0, 0, width, height);
     this.fractalBounds = new Bounds(realMin, imagMin, realMax - realMin, imagMax - imagMin);
 
-    this.map = new Array(height)
-      .fill(null)
-      .map(() => new Array(width).fill(null));
+    this.bufferedCanvas = new BufferedCanvas(width, height);
 
     this.resultListeners_ = new Set();
     this.populate();
@@ -29,7 +28,7 @@ export class InteractiveCanvas {
 
   listen(resultListener) {
     this.resultListeners_.add(resultListener);
-    resultListener(this.map);
+    resultListener(this.bufferedCanvas.frontCanvas);
   }
 
   /**
@@ -37,60 +36,54 @@ export class InteractiveCanvas {
    * @param {number} dpx 
    * @param {number} dpy 
    */
-  move(dpx, dpy) {
+  async move(dpx, dpy) {
     const { x: dr, y: di } = this.canvasBounds.convertUnit(-dpx, -dpy, this.fractalBounds);
     this.fractalBounds.move(dr, di);
-
-    const newMap = new Array(this.canvasBounds.height)
-      .fill(null)
-      .map(() => new Array(this.canvasBounds.width).fill(null));
 
     for (let y = 0; y < this.canvasBounds.height; y++) {
       for (let x = 0; x < this.canvasBounds.width; x++) {
         const px = x - dpx;
         const py = y - dpy;
 
-        if (this.map[py] != null && this.map[py][px] != null) {
-          newMap[y][x] = this.map[py][px];
+        if (this.bufferedCanvas.frontCanvas[py] != null && this.bufferedCanvas.frontCanvas[py][px] != null) {
+          this.bufferedCanvas.setValue(x, y, this.bufferedCanvas.frontCanvas[py][px]);
         } else {
           const { x: r, y: i } = this.canvasBounds.convert(x, y, this.fractalBounds);
-          newMap[y][x] = this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD);
+          this.bufferedCanvas.setValue(x, y, this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD));
         }
       }
     }
 
-    this.map = newMap;
-
+    
+    this.bufferedCanvas.commit();
     this.notifyListeners_();
   }
 
   populate() {
-    for (let y = 0; y < this.map.length; y++) {
-      for (let x = 0; x < this.map[y].length; x++) {
+    for (let y = 0; y < this.bufferedCanvas.height; y++) {
+      for (let x = 0; x < this.bufferedCanvas.width; x++) {
         const { x: r, y: i } = this.canvasBounds.convert(x, y, this.fractalBounds);
-        this.map[y][x] = this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD);
+        this.bufferedCanvas.setValue(x, y, this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD));
       }
     }
 
+    this.bufferedCanvas.commit();
     this.notifyListeners_();
   }
 
   async previewZoomIn_(px, py) {
-    const newMap = new Array(this.canvasBounds.height)
-      .fill(null)
-      .map(() => new Array(this.canvasBounds.width).fill(null));
-
-    for (let y = 0; y < this.canvasBounds.height; y++) {
-      for (let x = 0; x < this.canvasBounds.width; x++) {
+    for (let y = 0; y < this.bufferedCanvas.height; y++) {
+      for (let x = 0; x < this.bufferedCanvas.width; x++) {
         const dx = x - px;
         const dy = y - py;
 
         const tx = Math.floor(dx / 2) + px;
         const ty = Math.floor(dy / 2) + py;
-        newMap[y][x] = this.map[ty][tx];
+        this.bufferedCanvas.setValue(x, y, this.bufferedCanvas.frontCanvas[ty][tx]);
       }
     }
-    this.map = newMap;
+    
+    this.bufferedCanvas.commit();
     this.notifyListeners_();
   }
 
@@ -113,7 +106,7 @@ export class InteractiveCanvas {
 
   notifyListeners_() {
     for (const resultListener of this.resultListeners_) {
-      resultListener(this.map);
+      resultListener(this.bufferedCanvas.frontCanvas);
     }
   }
 }

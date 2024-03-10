@@ -12,7 +12,7 @@ mouseDragInteraction.register(canvas, interactiveCanvas);
 mouseZoomInteraction.register(canvas, interactiveCanvas);
 
 const imageData = ctx.createImageData(canvas.width, canvas.height);
-function paint(result) {
+async function generateImageData(result) {
   for (let y = 0; y < result.length; y++) {
     for (let x = 0; x < result[y].length; x++) {
       const iterations = result[y][x];
@@ -31,7 +31,10 @@ function paint(result) {
       }
     }
   }
-  ctx.putImageData(imageData, 0, 0);
+}
+
+function paint(result) {
+  generateImageData(result).then(() => ctx.putImageData(imageData, 0, 0));
 }
 
 interactiveCanvas.listen(paint);
