@@ -61,6 +61,25 @@ export class InteractiveCanvas {
     this.notifyListeners_();
   }
 
+  zoomIn(px, py) {
+    const newMap = new Array(this.height)
+      .fill(null)
+      .map(() => new Array(this.width).fill(null));
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const dx = x - px;
+        const dy = y - py;
+
+        const tx = Math.floor(dx / 2) + px;
+        const ty = Math.floor(dy / 2) + py;
+        newMap[y][x] = this.map[ty][tx];
+      }
+    }
+    this.map = newMap;
+    this.notifyListeners_();
+  }
+
   notifyListeners_() {
     for (const resultListener of this.resultListeners_) {
       resultListener(this.map);
