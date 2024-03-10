@@ -1,5 +1,5 @@
-const realMin = -2.0; // LEFT x min
-const realMax = 1.0; // RIGHT x max
+const realMin = -2.4; // LEFT x min
+const realMax = 1.2; // RIGHT x max
 const imagMin = -1.2; // bottom y min
 const imagMax = 1.2; // top y max
 const realTotal = realMax - realMin;
@@ -47,7 +47,7 @@ export class InteractiveCanvas {
   populate() {
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
-        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(i), this.leftTopI - this.convertPixelToImaginary(j));
+        this.map[i][j] = this.listener(this.leftTopR + this.convertPixelToReal(j), this.leftTopI - this.convertPixelToImaginary(i));
       }
     }
 
