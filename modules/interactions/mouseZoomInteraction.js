@@ -11,8 +11,8 @@ class MouseZoomInteraction extends AbstractInteraction {
     this.interactiveCanvas_?.zoomIn(x, y);
   }
 
-  zoomOut_({clientX, clientY}) {
-    console.log('zoom out');
+  zoomOut_(x, y) {
+    this.interactiveCanvas_?.zoomOut(x, y);
   }
 
   /**

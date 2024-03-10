@@ -16,11 +16,23 @@ export default class Bounds {
      * @param {number} centerX 
      * @param {number} centerY 
      */
-    zoom(centerX, centerY) {
+    zoomIn(centerX, centerY) {
         this.x = (this.x + centerX) / 2;
         this.y = (this.y + centerY) / 2;
         this.width /= 2;
         this.height /= 2;
+    }
+
+    /**
+     * Zoom bounds relative to centerX, centerY
+     * @param {number} centerX 
+     * @param {number} centerY 
+     */
+    zoomOut(centerX, centerY) {
+        this.x -= (centerX - this.x);
+        this.y -= (centerY - this.y);
+        this.width *= 2;
+        this.height *= 2;
     }
 
     /**
@@ -43,5 +55,9 @@ export default class Bounds {
             x: x * bounds.width / this.width,
             y: y * bounds.height / this.height,
         };
+    }
+
+    copy() {
+        return new Bounds(this.x, this.y, this.width, this.height);
     }
 }

@@ -38,7 +38,7 @@ export class InteractiveCanvas {
    * @param {number} dpy 
    */
   move(dpx, dpy) {
-    const {x: dr, y: di} = this.canvasBounds.convertUnit(-dpx, -dpy, this.fractalBounds);
+    const { x: dr, y: di } = this.canvasBounds.convertUnit(-dpx, -dpy, this.fractalBounds);
     this.fractalBounds.move(dr, di);
 
     const newMap = new Array(this.canvasBounds.height)
@@ -53,7 +53,7 @@ export class InteractiveCanvas {
         if (this.map[py] != null && this.map[py][px] != null) {
           newMap[y][x] = this.map[py][px];
         } else {
-          const {x: r, y: i} = this.canvasBounds.convert(x, y, this.fractalBounds);
+          const { x: r, y: i } = this.canvasBounds.convert(x, y, this.fractalBounds);
           newMap[y][x] = this.listener(r, i, this.fractalBounds.width < PRECISE_THRESHOLD);
         }
       }
@@ -75,7 +75,7 @@ export class InteractiveCanvas {
     this.notifyListeners_();
   }
 
-  async previewZoom_(px, py) {
+  async previewZoomIn_(px, py) {
     const newMap = new Array(this.canvasBounds.height)
       .fill(null)
       .map(() => new Array(this.canvasBounds.width).fill(null));
@@ -94,14 +94,21 @@ export class InteractiveCanvas {
     this.notifyListeners_();
   }
 
-  async realZoom_(px, py) {
+  realZoomIn_(px, py) {
     const { x: r, y: i } = this.canvasBounds.convert(px, py, this.fractalBounds);
-    this.fractalBounds.zoom(r, i);
+    this.fractalBounds.zoomIn(r, i);
     this.populate();
   }
 
   zoomIn(px, py) {
-    this.previewZoom_(px, py).then(() => this.realZoom_(px, py));
+    this.previewZoomIn_(px, py).then(() => this.realZoomIn_(px, py));
+  }
+  
+  zoomOut(px, py) {
+    const { x: r, y: i } = this.canvasBounds.convert(px, py, this.fractalBounds);
+    this.fractalBounds.zoomOut(r, i);
+
+    this.populate();
   }
 
   notifyListeners_() {
