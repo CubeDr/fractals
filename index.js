@@ -8,8 +8,8 @@ const interactiveCanvas = new InteractiveCanvas(600, 400, mandelbrot);
 const canvas = document.getElementById('fractalCanvas');
 const ctx = canvas.getContext('2d');
 
-mouseDragInteraction.register(canvas);
-mouseZoomInteraction.register(canvas);
+mouseDragInteraction.register(canvas, interactiveCanvas);
+mouseZoomInteraction.register(canvas, interactiveCanvas);
 
 const result = interactiveCanvas.populate();
 for (let y = 0; y < result.length; y++) {

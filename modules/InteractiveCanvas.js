@@ -31,9 +31,9 @@ export class InteractiveCanvas {
    * @param {number} dpy 
    */
   move(dpx, dpy) {
-    this.leftTopR += this.convertPixelToReal(dpx);
-    this.leftTopI -= this.convertPixelToImaginary(dpy);
-    return populate();
+    this.leftTopR -= this.convertPixelToReal(dpx);
+    this.leftTopI += this.convertPixelToImaginary(dpy);
+    return this.populate();
   }
 
   convertPixelToReal(px) {
